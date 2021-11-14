@@ -50,13 +50,13 @@ class NMT(nn.Module):
         ###     self.decoder_cell_init (Linear layer with no bias), for initializing the decoder's state
         ###                        and cells with encoder_hidden_states
         
-        self.encoder_lstm = None
-        self.decoder_lstm = None 
-        self.att_src_linear = None
-        self.att_vec_linear = None
-        self.target_vocab_projection = None
-        self.dropout = None        
-        self.decoder_cell_init = None
+        self.encoder_lstm = nn.LSTM(embed_size, hidden_size, bidirectional=True, dropout=dropout_rate)
+        self.decoder_lstm = nn.LSTMCell(embed_size + hidden_size, hidden_size) 
+        self.att_src_linear = nn.Linear(hidden_size * 2, hidden_size, bias=False)
+        self.att_vec_linear = nn.Linear(hidden_size * 2 + hidden_size, hidden_size, bias=False)
+        self.target_vocab_projection = nn.Linear(hidden_size, len(vocab.tgt), bias=False)
+        self.dropout = nn.Dropout(dropout_rate)      
+        self.decoder_cell_init = nn.Linear(hidden_size * 2, hidden_size)
         
         ### END YOUR CODE
     
