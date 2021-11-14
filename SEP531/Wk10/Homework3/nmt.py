@@ -128,7 +128,18 @@ class NMT(nn.Module):
         """
         
         ### YOUR CODE HERE
-        ###
+        
+        # (src_sent_len, batch_size, embed_size)
+        src_word_embed = self.src_embed(source_padded)
+        packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
+
+        # output: (src_sent_len, batch_size, hidden_size)
+        enc_hiddens, (last_state, last_cell) = self.encoder_lstm(packed_src_embed)
+        enc_hiddens, _ = pad_packed_sequence(enc_hiddens)
+        
+        dec_init_cell = self.decoder_cell_init(torch.cat([last_cell[0], last_cell[1]], 1))
+        dec_init_state = F.tanh(dec_init_cell)
+
         ### END YOUR CODE
         
         return enc_hiddens, (dec_init_state, dec_init_cell)
@@ -168,6 +179,28 @@ class NMT(nn.Module):
         combined_outputs = []
         
         ### YOUR CODE HERE
+        
+        # start from `<s>`, until y_{T-1}
+        for y_tm1_embed in tgt_embeds.split(split_size=1):
+            # input feeding: concate y_tm1 and previous attentional vector
+            x = torch.cat([y_tm1_embed.squeeze(0), att_tm1], 1)
+
+            # h_t: (batch_size, hidden_size)
+            h_t, cell_t = self.decoder_lstm(x, hidden)
+            h_t = self.dropout(h_t)
+
+            ctx_t, alpha_t = self.dot_prod_attention(h_t, enc_hiddens, enc_hiddens_att_linear)
+
+            att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))   # E.q. (5)
+            att_t = self.dropout(att_t)
+
+            score_t = self.readout(att_t)   # E.q. (6)
+            combined_outputs.append(score_t)
+
+            att_tm1 = att_t
+            hidden = h_t, cell_t
+
+        scores = torch.stack(combined_outputs)
         
         ### END YOUR CODE
         
