@@ -138,7 +138,7 @@ def train(args: Dict):
     vocab_mask = torch.ones(len(vocab.tgt))
     vocab_mask[vocab.tgt['<pad>']] = 0
 
-    device = "cuda:1" if torch.cuda.is_available() else "cpu"
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print('use device: %s' % device, file=sys.stderr)
     
     model = model.to(device)
@@ -278,7 +278,7 @@ def decode(args: Dict[str, str]):
     model = NMT.load(args['MODEL_PATH'])
     
     if args['--cuda']:
-        model = model.to(torch.device("cuda:1"))
+        model = model.to(torch.device("cuda:0"))
         
     hypotheses = beam_search(model, test_data_src,
                              beam_size=int(args['--beam-size']),
