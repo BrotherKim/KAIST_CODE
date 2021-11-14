@@ -242,6 +242,26 @@ class NMT(nn.Module):
         ###        to obtain the output vector
         
         
+        ''' ### origin start ### TODO
+        h_t, cell_t = self.decoder_lstm(x, dec_state)
+        h_t = self.dropout(h_t)
+
+        ctx_t, alpha_t = self.dot_prod_attention(h_t, enc_hiddens.permute(1, 0, 2), enc_hiddens_att_linear.permute(1, 0, 2))
+
+        att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))
+        att_t = self.dropout(att_t)
+
+        //
+        p_t = F.log_softmax(self.readout(att_t))
+        ### origin end ###'''
+        
+        h_t, cell_t = self.decoder_lstm(x, dec_state)
+        h_t = self.dropout(h_t)
+
+        ctx_t, alpha_t = self.dot_prod_attention(h_t, enc_hiddens.permute(1, 0, 2), enc_hiddens_att_linear.permute(1, 0, 2))
+
+        att_t = F.tanh(self.att_vec_linear(torch.cat([h_t, ctx_t], 1)))
+        att_t = self.dropout(att_t)
         
         ### END YOUR CODE
         
@@ -257,6 +277,8 @@ class NMT(nn.Module):
         ###     1. Compute the attention scores att_score using batched matrix multiplication 
         ###         between enc_hiddens_att_linear and h_t
         
+        # (batch_size, src_sent_len)
+        att_scores = torch.bmm(enc_hiddens_att_linear, h_t.unsqueeze(2)).squeeze(2)
         
         ### END YOUR CODE
         
@@ -269,8 +291,15 @@ class NMT(nn.Module):
         ###     2. Use batched matrix multiplication between alpha_t and enc_hiddens to obtain the
         ###          attention output vector, context_vector.
         
+        att_scores = F.softmax(att_scores)
+
+        att_view = (att_scores.size(0), 1, att_scores.size(1))
+        # (batch_size, hidden_size)
+        context_vector = torch.bmm(att_scores.view(*att_view), enc_hiddens).squeeze(1)
         
         ### END YOUR CODE
+        
+        alpha_t = att_scores
         
         return context_vector, alpha_t
     
