@@ -45,13 +45,11 @@ class NMT(nn.Module):
         ###     self.encoder_lstm (Bidirectional LSTM with bias)
         self.encoder_lstm = nn.LSTM(embed_size, hidden_size, bidirectional=True)
         ###     self.decoder_lstm (LSTM Cell with bias)
-        self.decoder_lstm = nn.LSTMCell(embed_size, hidden_size) 
-        #self.decoder_lstm = nn.LSTMCell(embed_size + hidden_size, hidden_size) 
+        self.decoder_lstm = nn.LSTMCell(embed_size + hidden_size, hidden_size) 
         ###     self.att_src_linear (Linear layer with no bias), for projecting encoder states to attention
         self.att_src_linear = nn.Linear(hidden_size * 2, hidden_size, bias=False)
         ###     self.att_vec_linear (Linear layer with no bias), 
-        self.att_vec_linear = nn.Linear(hidden_size * 2, hidden_size, bias=False)
-        #self.att_vec_linear = nn.Linear(hidden_size * 2 + hidden_size, hidden_size, bias=False)
+        self.att_vec_linear = nn.Linear(hidden_size * 2 + hidden_size, hidden_size, bias=False)
         ###     self.target_vocab_projection (Linaer layer with no bias)
         self.target_vocab_projection = nn.Linear(hidden_size, len(vocab.tgt), bias=False)
         ###     self.dropout (Dropout layer)
@@ -139,6 +137,9 @@ class NMT(nn.Module):
         # enc_hiddens: (source_lengths, batch_size, hidden_size)
         enc_hiddens, (last_state, last_cell) = self.encoder_lstm(packed_src_embed)
         enc_hiddens, _ = pad_packed_sequence(enc_hiddens)
+
+        # (batch_size, src_sent_len, hidden_size * 2)
+        enc_hiddens = enc_hiddens.permute(1, 0, 2)
 
         dec_init_cell = self.decoder_cell_init(torch.cat([last_cell[0], last_cell[1]], 1))
         dec_init_state = F.tanh(dec_init_cell)
