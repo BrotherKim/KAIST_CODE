@@ -336,64 +336,64 @@ def main():
     
     if args['train']:
         args = dict()
-        args['train_src'] = "./data/train.de-en.de.wmixerprep"
-        args['train_tgt'] = "./data/train.de-en.en.wmixerprep"
-        args['dev_src'] = "./data/valid.de-en.de"
-        args['dev_tgt'] = "./data/valid.de-en.en"
-        args['vocab'] = "./data/vocab.json"
+        args['--train_src'] = "./data/train.de-en.de.wmixerprep"
+        args['--train_tgt'] = "./data/train.de-en.en.wmixerprep"
+        args['--dev_src'] = "./data/valid.de-en.de"
+        args['--dev_tgt'] = "./data/valid.de-en.en"
+        args['--vocab'] = "./data/vocab.json"
 
-        args['seed'] = 0
-        args['batch_size'] = 32
-        args['embed_size'] = 256
-        args['hidden_size'] = 256
-        args['clip_grad'] = 5.0
-        args['log_every'] = 10
-        args['max_epoch'] = 30
-        args['patience'] = 5
-        args['max_num_trial'] = 5
-        args['lr_decay'] = 0.5
-        args['beam_size'] = 5
-        args['lr'] = 0.001
-        args['uniform_init'] = 0.1
-        args['save_to'] = '%s/checkpoint' % (gdrive)
-        args['valid_niter'] = 100
-        args['dropout'] = 0.3
-        args['max_decoding_time_step'] = 70
-        args['cuda'] = True
-        args['continue_training'] = False
+        args['--seed'] = 0
+        args['--batch_size'] = 32
+        args['--embed_size'] = 256
+        args['--hidden_size'] = 256
+        args['--clip_grad'] = 5.0
+        args['--log_every'] = 10
+        args['--max_epoch'] = 30
+        args['--patience'] = 5
+        args['--max_num_trial'] = 5
+        args['--lr_decay'] = 0.5
+        args['--beam_size'] = 5
+        args['--lr'] = 0.001
+        args['--uniform_init'] = 0.1
+        args['--save_to'] = '%s/checkpoint' % (gdrive)
+        args['--valid_niter'] = 100
+        args['--dropout'] = 0.3
+        args['--max_decoding_time_step'] = 70
+        args['--cuda'] = True
+        args['--continue_training'] = False
         train(args)
     elif args['decode']:
         args = dict()
 
-        args['train_src'] = "./data/train.de-en.de.wmixerprep"
-        args['train_tgt'] = "./data/train.de-en.en.wmixerprep"
-        args['dev_src'] = "./data/valid.de-en.de"
-        args['dev_tgt'] = "./data/valid.de-en.en"
-        args['test_src'] = './data/test.de-en.de'
-        args['test_tgt'] = './data/test.de-en.en'
-        args['vocab'] = "./data/vocab.json"
-        args['model_path'] = "%s/checkpoint/model.bin" % (gdrive)
-        args['output_dir'] = '%s/output_dir' % (gdrive)
+        args['--train_src'] = "./data/train.de-en.de.wmixerprep"
+        args['--train_tgt'] = "./data/train.de-en.en.wmixerprep"
+        args['--dev_src'] = "./data/valid.de-en.de"
+        args['--dev_tgt'] = "./data/valid.de-en.en"
+        args['--test_src'] = './data/test.de-en.de'
+        args['--test_tgt'] = './data/test.de-en.en'
+        args['--vocab'] = "./data/vocab.json"
+        args['--model_path'] = "%s/checkpoint/model.bin" % (gdrive)
+        args['--output_dir'] = '%s/output_dir' % (gdrive)
 
-        args['output_file'] = 'output.txt'
-        args['seed'] = 0
-        args['batch_size'] = 32
-        args['embed_size'] = 256
-        args['hidden_size'] = 256
-        args['clip_grad'] = 5.0
-        args['log_every'] = 10
-        args['max_epoch'] = 30
-        args['patience'] = 5
-        args['max_num_trial'] = 5
-        args['lr_decay'] = 0.5
-        args['beam_size'] = 5
-        args['lr'] = 0.001
-        args['uniform_init'] = 0.1
-        args['save_to'] = './checkpoint'
-        args['valid_niter'] = 100
-        args['dropout'] = 0.3
-        args['max_decoding_time_step'] = 70
-        args['cuda'] = True
+        args['--output_file'] = 'output.txt'
+        args['--seed'] = 0
+        args['--batch_size'] = 32
+        args['--embed_size'] = 256
+        args['--hidden_size'] = 256
+        args['--clip_grad'] = 5.0
+        args['--log_every'] = 10
+        args['--max_epoch'] = 30
+        args['--patience'] = 5
+        args['--max_num_trial'] = 5
+        args['--lr_decay'] = 0.5
+        args['--beam_size'] = 5
+        args['--lr'] = 0.001
+        args['--uniform_init'] = 0.1
+        args['--save_to'] = './checkpoint'
+        args['--valid_niter'] = 100
+        args['--dropout'] = 0.3
+        args['--max_decoding_time_step'] = 70
+        args['--cuda'] = True
         decode(args)
     else:
         raise RuntimeError('invalid run mode')
