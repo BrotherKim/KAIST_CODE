@@ -55,12 +55,12 @@ class NMT(nn.Module):
         """
         super(NMT, self).__init__()
         
-        self.model_embeddings = ModelEmbeddings(self.embed_size, self.vocab)
-        
         self.embed_size = embed_size
         self.hidden_size = hidden_size
         self.dropout_rate = dropout_rate
         self.vocab = vocab
+        
+        self.model_embeddings = ModelEmbeddings(self.embed_size, self.vocab)
         
         # initialize neural network layers for implementing Nueral Machine Translation Model
         self.src_embed = nn.Embedding(len(vocab.src), embed_size, padding_idx=vocab.src['<pad>'])
