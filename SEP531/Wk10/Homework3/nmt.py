@@ -48,6 +48,7 @@ class NMT(nn.Module):
         ###     self.att_src_linear (Linear layer with no bias), for projecting encoder states to attention
         self.att_src_linear = nn.Linear(hidden_size * 2, hidden_size, bias=False)
         ###     self.att_vec_linear (Linear layer with no bias), 
+        #self.att_vec_linear = nn.Linear(hidden_size * 2, hidden_size, bias=False)
         self.att_vec_linear = nn.Linear(hidden_size * 2 + hidden_size, hidden_size, bias=False)
         ###     self.target_vocab_projection (Linaer layer with no bias)
         self.target_vocab_projection = nn.Linear(hidden_size, len(vocab.tgt), bias=False)
@@ -129,8 +130,10 @@ class NMT(nn.Module):
         ### YOUR CODE HERE
         
         # (src_sent_len, batch_size, embed_size)
-        src_word_embed = self.src_embed(source_padded)
-        packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
+        #src_word_embed = self.src_embed(source_padded)
+        #packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
+        #src_word_embed = self.src_embed(source_padded)
+        packed_src_embed = pack_padded_sequence(source_padded, source_lengths)
 
         # output: (src_sent_len, batch_size, hidden_size)
         enc_hiddens, (last_state, last_cell) = self.encoder_lstm(packed_src_embed)
