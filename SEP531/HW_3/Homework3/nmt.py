@@ -53,7 +53,7 @@ class NMT(nn.Module):
         ###     self.target_vocab_projection (Linaer layer with no bias)
         self.target_vocab_projection = nn.Linear(hidden_size, len(vocab.tgt), bias=False)
         ###     self.dropout (Dropout layer)
-        self.dropout = nn.Dropout(dropout)        
+        self.dropout = nn.Dropout(dropout_rate)        
         ###     self.decoder_cell_init (Linear layer with no bias), for initializing the decoder's state
         ###                        and cells with encoder_hidden_states
         self.decoder_cell_init = nn.Linear(hidden_size * 2, hidden_size)
