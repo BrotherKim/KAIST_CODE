@@ -187,7 +187,7 @@ class NMT(nn.Module):
         #         - After you apply the encoder, you need to apply the `pad_packed_sequence` function to enc_hiddens.
         #         - Note that the shape of the tensor returned by the encoder is (src_len b, h*2) and we want to
         #           return a tensor of shape (b, src_len, h*2) as `enc_hiddens`.
-        enc_hiddens1, (last_hidden, last_cell) = self.encoder.forward(pack_padded_sequence(X, source_lengths))
+        enc_hiddens1, (last_hidden, last_cell) = self.encoder_lstm.forward(pack_padded_sequence(X, source_lengths))
         enc_hiddens2 = pad_packed_sequence(enc_hiddens1)[0]
         enc_hiddens = enc_hiddens2.permute(1,0,2)
 
@@ -199,7 +199,7 @@ class NMT(nn.Module):
         #             Apply the h_projection layer to this in order to compute init_decoder_hidden.
         #             This is h_0^{dec} in the PDF. Here b = batch size, h = hidden size
         temp_hidden = torch.cat(tuple(last_hidden), dim =1)
-        init_decoder_hidden = self.h_projection.forward(temp_hidden)
+        init_decoder_hidden = self.att_src_linear.forward(temp_hidden)
         #         - `init_decoder_cell`:
         #             `last_cell` is a tensor shape (2, b, h).
         #             The first dimension corresponds to forwards and backwards.
@@ -207,7 +207,7 @@ class NMT(nn.Module):
         #             Apply the c_projection layer to this in order to compute init_decoder_cell.
         #             This is c_0^{dec} in the PDF. Here b = batch size, h = hidden size
         temp_cell = torch.cat(tuple(last_cell), dim =1)
-        init_decoder_cell = self.c_projection.forward(temp_cell)
+        init_decoder_cell = self.att_vec_linear.forward(temp_cell)
         dec_init_state = (init_decoder_hidden, init_decoder_cell)
         # See the following docs, as you may need to use some of the following functions in your implementation:
         #     Pack the padded sequence X before passing to the encoder:
