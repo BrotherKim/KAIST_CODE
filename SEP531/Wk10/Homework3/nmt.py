@@ -13,6 +13,31 @@ from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
 
 Hypothesis = namedtuple('Hypothesis', ['value', 'score'])
 
+class ModelEmbeddings(nn.Module):
+    """
+    Class that converts input words to their embeddings.
+    """
+    def __init__(self, embed_size, vocab):
+        """
+        Init the Embedding layers.
+        @param embed_size (int): Embedding size (dimensionality)
+        @param vocab (Vocab): Vocabulary object containing src and tgt languages
+                              See vocab.py for documentation.
+        """
+        super(ModelEmbeddings, self).__init__()
+        self.embed_size = embed_size
+
+        # default values
+        self.source = None
+        self.target = None
+
+        src_pad_token_idx = vocab.src['<pad>']
+        tgt_pad_token_idx = vocab.tgt['<pad>']
+
+        self.source = nn.Embedding(len(vocab.src), embed_size, padding_idx=src_pad_token_idx)
+        self.target = nn.Embedding(len(vocab.tgt), embed_size, padding_idx=tgt_pad_token_idx)
+
+
 class NMT(nn.Module):
     """ Simple Neural Machine Translation Model:
         - Bidrectional LSTM Encoder
@@ -128,12 +153,12 @@ class NMT(nn.Module):
         """
         
         ### YOUR CODE HERE
-        
+        '''
         # (src_sent_len, batch_size, embed_size)
+        src_word_embed = self.src_embed(source_padded)
+        packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
         #src_word_embed = self.src_embed(source_padded)
-        #packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
-        #src_word_embed = self.src_embed(source_padded)
-        packed_src_embed = pack_padded_sequence(source_padded, source_lengths)
+        #packed_src_embed = pack_padded_sequence(source_padded, source_lengths)
 
         # output: (src_sent_len, batch_size, hidden_size)
         enc_hiddens, (last_state, last_cell) = self.encoder_lstm(packed_src_embed)
@@ -145,6 +170,57 @@ class NMT(nn.Module):
         ### END YOUR CODE
         
         return enc_hiddens, (dec_init_state, dec_init_cell)
+        '''
+        
+        enc_hiddens, dec_init_state = None, None
+
+        # YOUR CODE HERE (~ 8 Lines)
+        # TODO:
+        #     1. Construct Tensor `X` of source sentences with shape (src_len, b, e) using the source model embeddings.
+        #         src_len = maximum source sentence length, b = batch size, e = embedding size. Note
+        #         that there is no initial hidden state or cell for the decoder.
+        X = ModelEmbeddings(self.embed_size, self.vocab).source(source_padded)
+        #     2. Compute `enc_hiddens`, `last_hidden`, `last_cell` by applying the encoder to `X`.
+        #         - Before you can apply the encoder, you need to apply the `pack_padded_sequence` function to X.
+        #         - After you apply the encoder, you need to apply the `pad_packed_sequence` function to enc_hiddens.
+        #         - Note that the shape of the tensor returned by the encoder is (src_len b, h*2) and we want to
+        #           return a tensor of shape (b, src_len, h*2) as `enc_hiddens`.
+        enc_hiddens1, (last_hidden, last_cell) = self.encoder.forward(pack_padded_sequence(X, source_lengths))
+        enc_hiddens2 = pad_packed_sequence(enc_hiddens1)[0]
+        enc_hiddens = enc_hiddens2.permute(1,0,2)
+
+        #     3. Compute `dec_init_state` = (init_decoder_hidden, init_decoder_cell):
+        #         - `init_decoder_hidden`:
+        #             `last_hidden` is a tensor shape (2, b, h).
+        #             The first dimension corresponds to forwards and backwards.
+        #             Concatenate the forwards and backwards tensors to obtain a tensor shape (b, 2*h).
+        #             Apply the h_projection layer to this in order to compute init_decoder_hidden.
+        #             This is h_0^{dec} in the PDF. Here b = batch size, h = hidden size
+        temp_hidden = torch.cat(tuple(last_hidden), dim =1)
+        init_decoder_hidden = self.h_projection.forward(temp_hidden)
+        #         - `init_decoder_cell`:
+        #             `last_cell` is a tensor shape (2, b, h).
+        #             The first dimension corresponds to forwards and backwards.
+        #             Concatenate the forwards and backwards tensors to obtain a tensor shape (b, 2*h).
+        #             Apply the c_projection layer to this in order to compute init_decoder_cell.
+        #             This is c_0^{dec} in the PDF. Here b = batch size, h = hidden size
+        temp_cell = torch.cat(tuple(last_cell), dim =1)
+        init_decoder_cell = self.c_projection.forward(temp_cell)
+        dec_init_state = (init_decoder_hidden, init_decoder_cell)
+        # See the following docs, as you may need to use some of the following functions in your implementation:
+        #     Pack the padded sequence X before passing to the encoder:
+        #         https://pytorch.org/docs/stable/nn.html#torch.nn.utils.rnn.pack_padded_sequence
+        #     Pad the packed sequence, enc_hiddens, returned by the encoder:
+        #         https://pytorch.org/docs/stable/nn.html#torch.nn.utils.rnn.pad_packed_sequence
+        #     Tensor Concatenation:
+        #         https://pytorch.org/docs/stable/torch.html#torch.cat
+        #     Tensor Permute:
+        #         https://pytorch.org/docs/stable/tensors.html#torch.Tensor.permute
+
+        # END YOUR CODE
+
+        return enc_hiddens, dec_init_state
+        
     
     def decode(self, enc_hiddens: torch.Tensor, enc_masks: torch.Tensor,
                 dec_init_state: Tuple[torch.Tensor, torch.Tensor], target_padded: torch.Tensor) -> torch.Tensor:
