@@ -262,7 +262,6 @@ class NMT(nn.Module):
         ###     2. Compute the attention mechansim to obtain the context vector and attention weights,
         ###         context_t and alpha_t
         ctx_t, alpha_t = self.dot_prod_attention(h_t, enc_hiddens, enc_hiddens_att_linear, enc_masks)
-        #ctx_t, alpha_t = self.dot_prod_attention(h_t, enc_hiddens.permute(1, 0, 2), enc_hiddens_att_linear.permute(1, 0, 2))
 
         ###     3. Concatenate the decoder hidden state with context_t
         ###     4. Apply self.att_vec_linear layer, the Tanh function, and then the dropout layer
