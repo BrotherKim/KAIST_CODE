@@ -131,7 +131,7 @@ class NMT(nn.Module):
         
         # (source_lengths, batch_size, embed_size)
         src_word_embed = self.src_embed(source_padded)
-        packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths + 1)
+        packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
         #packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
 
         # enc_hiddens: (source_lengths, batch_size, hidden_size)
