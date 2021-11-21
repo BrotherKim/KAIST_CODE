@@ -128,7 +128,8 @@ class VocabEntry(object):
         word_ids = self.words2indices(sents)
         sents_t = pad_sents(word_ids, self['<pad>'])
         sents_var = torch.tensor(sents_t, dtype=torch.long, device=device)
-        return sents_var
+        #return sents_var
+        return torch.t(sents_var)
     
     @staticmethod
     def from_corpus(corpus, size, freq_cutoff=2):
