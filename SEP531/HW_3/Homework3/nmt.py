@@ -77,8 +77,8 @@ class NMT(nn.Module):
         # Convert list of lists into tensor
         # shape of source_padded: (src_len, b)
         # shape of target_padded: (tgt_len, b)
-        source_padded = self.vocab.src.to_input_tensor(source, device=self.device)
-        target_padded = self.vocab.tgt.to_input_tensor(target, device=self.device)
+        source_padded = torch.t(self.vocab.src.to_input_tensor(source, device=self.device))
+        target_padded = torch.t(self.vocab.tgt.to_input_tensor(target, device=self.device))
         
         ### Run the network forward:
         ### 1. Apply the encoder to 'source_padded' by calling 'self.encode()'
