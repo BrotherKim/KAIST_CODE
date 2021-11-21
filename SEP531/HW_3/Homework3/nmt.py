@@ -257,7 +257,7 @@ class NMT(nn.Module):
         
         ###     1. Apply the decoder to 'x' and 'dec_state' to obatin the new decoder state
         h_t, cell_t = self.decoder_lstm(x, dec_state)
-        h_t = self.dropout(h_t)
+        #h_t = self.dropout(h_t)
 
         ###     2. Compute the attention mechansim to obtain the context vector and attention weights,
         ###         context_t and alpha_t
