@@ -128,7 +128,20 @@ class NMT(nn.Module):
         """
         
         ### YOUR CODE HERE
+        enc_hiddens, dec_init_state = None, None
         
+        enc_hiddens1, (last_hidden, last_cell) = self.encoder.forward(pack_padded_sequence(X, source_lengths))
+        enc_hiddens2 = pad_packed_sequence(enc_hiddens1)[0]
+        enc_hiddens = enc_hiddens2.permute(1,0,2)
+        
+        temp_hidden = torch.cat(tuple(last_hidden), dim =1)
+        init_decoder_hidden = self.h_projection.forward(temp_hidden)
+        
+        temp_cell = torch.cat(tuple(last_cell), dim =1)
+        init_decoder_cell = self.c_projection.forward(temp_cell)
+        dec_init_state = (init_decoder_hidden, init_decoder_cell)
+        
+        '''
         # (src_sent_len, batch_size, embed_size)
         src_word_embed = self.src_embed(source_padded)
         packed_src_embed = pack_padded_sequence(src_word_embed, source_lengths)
@@ -143,6 +156,8 @@ class NMT(nn.Module):
         ### END YOUR CODE
         
         return enc_hiddens, (dec_init_state, dec_init_cell)
+        '''
+        return enc_hiddens, dec_init_state
     
     def decode(self, enc_hiddens: torch.Tensor, enc_masks: torch.Tensor,
                 dec_init_state: Tuple[torch.Tensor, torch.Tensor], target_padded: torch.Tensor) -> torch.Tensor:
