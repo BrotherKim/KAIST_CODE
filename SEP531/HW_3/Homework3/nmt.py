@@ -290,6 +290,7 @@ class NMT(nn.Module):
         """
         enc_masks = torch.zeros(enc_hiddens.size(0), enc_hiddens.size(1), dtype=torch.float)
         for e_id, src_len in enumerate(source_lengths):
+            print('[DEBUG} (%d),e_id(%d),src_len(%d)\n' % (len(enc_masks), e_id, src_len))
             enc_masks[e_id, src_len:] = 1
         return enc_masks.to(self.device)
     
