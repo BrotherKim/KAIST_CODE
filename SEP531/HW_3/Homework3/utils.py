@@ -29,11 +29,14 @@ def pad_sents(sents, pad_token):
     ###[DONE] YOUR CODE HERE
     
     max_len = max(len(s) for s in sents)
-    for s in sents:
-        padded = [pad_token] * max_len
-        padded[:len(s)] = s
-        sents_padded.append(padded)
-        
+#    for s in sents:
+#        padded = [pad_token] * max_len
+#        padded[:len(s)] = s
+#        sents_padded.append(padded)
+    batch_size = len(sents)
+    for i in range(max_len):
+        sents_padded.append([sents[k][i] if len(sents[k]) > i else pad_token for k in range(batch_size)])
+
     ###[DONE] END YOUR CODE
     
     return sents_padded
