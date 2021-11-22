@@ -335,7 +335,6 @@ def main():
     gdrive = '/content/drive/MyDrive/KAIST/SEP531/hw3_cp'
     
     if args['train']:
-        args = dict()
         args['--train_src'] = "./data/train.de-en.de.wmixerprep"
         args['--train_tgt'] = "./data/train.de-en.en.wmixerprep"
         args['--dev_src'] = "./data/valid.de-en.de"
@@ -361,10 +360,9 @@ def main():
         args['--max_decoding_time_step'] = 70
         args['--cuda'] = True
         args['--continue_training'] = False
+        print(args)
         train(args)
     elif args['decode']:
-        args = dict()
-
         args['--train_src'] = "./data/train.de-en.de.wmixerprep"
         args['--train_tgt'] = "./data/train.de-en.en.wmixerprep"
         args['--dev_src'] = "./data/valid.de-en.de"
