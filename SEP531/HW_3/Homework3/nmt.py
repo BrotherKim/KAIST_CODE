@@ -332,7 +332,7 @@ class NMT(nn.Module):
                 value: List[str]: the decoded target sentence, represented as a list of words
                 score: float: the log-likelihood of the target sentence
         """
-        src_sents_var = self.vocab.src.to_input_tensor([src_sent], self.device)
+        src_sents_var = torch.t(self.vocab.src.to_input_tensor([src_sent], self.device))
         
         src_encodings, dec_init_vec = self.encode(src_sents_var, [len(src_sent)])
         src_encodings_att_linear = self.att_src_linear(src_encodings)
