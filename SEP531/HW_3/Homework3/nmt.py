@@ -30,7 +30,7 @@ class ModelEmbeddings(nn.Module):
         # default values
         self.source = None
         self.target = None
-
+        
         src_pad_token_idx = vocab.src['<pad>']
         tgt_pad_token_idx = vocab.tgt['<pad>']
 
@@ -256,7 +256,7 @@ class NMT(nn.Module):
         ### TODO:
         
         ###     1. Apply the decoder to 'x' and 'dec_state' to obatin the new decoder state
-        h_t, cell_t = self.decoder_lstm(x, dec_state)
+        h_t, cell_t = torch.t(self.decoder_lstm(x, dec_state))
         #h_t = self.dropout(h_t)
 
         ###     2. Compute the attention mechansim to obtain the context vector and attention weights,
