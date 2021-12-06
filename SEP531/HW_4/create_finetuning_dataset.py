@@ -141,6 +141,7 @@ def convert_examples_to_features(examples, max_seq_len, tokenizer,
         #### YOUR CODE HERE ####
         # Add [SEP] token
         # Assign segment ids for sequence A
+        global token_type_ids
         tokens += [sep_token]
         token_type_ids = [sequence_a_segment_id] * len(tokens)
         #### END CODE HERE ####

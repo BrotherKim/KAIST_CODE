@@ -98,7 +98,7 @@ class KoBertTokenizer(PreTrainedTokenizer):
                 self.idx2token.append(token)
 
         try:
-            import sentencepiece as spm
+            import sentencepiece as 
         except ImportError:
             logger.warning("You need to install SentencePiece to use KoBertTokenizer: https://github.com/google/sentencepiece"
                            "pip install sentencepiece")
