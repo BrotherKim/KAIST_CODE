@@ -26,12 +26,12 @@ class Trainer(object):
 
         #### YOUR CODE HERE ####
         # Load BERT configuration and BertForSequenceClassification from HuggingFace
-        self.config = self.config_class.from_pretrained(args.model_name_or_path,
+        self.config = self.config_class.from_pretrained(args['model_name_or_path'],
                                                         num_labels=self.num_labels, 
                                                         finetuning_task=args.task,
                                                         id2label={str(i): label for i, label in enumerate(self.label_lst)},
                                                         label2id={label: i for i, label in enumerate(self.label_lst)})
-        self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
+        self.model = self.model_class.from_pretrained(args['model_name_or_path'], config=self.config)
         #### END CODE HERE ####
 
         # GPU or CPU
