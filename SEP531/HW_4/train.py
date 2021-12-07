@@ -141,7 +141,7 @@ class Trainer(object):
         eval_dataloader = DataLoader(dataset, sampler=eval_sampler, batch_size=self.args['eval_batch_size'])
 
         # Eval!
-        logger.info("***** Running evaluation on %s dataset *****", mode)
+        logger.info("*****d Running evaluation on %s dataset *****", mode)
         logger.info("  Num examples = %d", len(dataset))
         logger.info("  Batch size = %d", self.args['eval_batch_size'])
         eval_loss = 0.0
@@ -184,19 +184,19 @@ class Trainer(object):
         logger.info("***** Eval results *****")
         for key in sorted(results.keys()):
             logger.info("  %s = %s", key, str(results[key]))
-        print('accuracy', metrics.accuracy_score(out_label_ids,preds) )
-        print('precision1', metrics.precision_score(out_label_ids,preds, average=None)) #
-        print('precision2', metrics.precision_score(out_label_ids,preds, average=None).mean()) #
-        print('precision3', metrics.precision_score(out_label_ids,preds, average='macro')) #1.0
-        print('precision4', metrics.precision_score(out_label_ids,preds, average='micro')) #1.0
-        print('recall1', metrics.recall_score(out_label_ids,preds, average=None)) #
-        print('recall2', metrics.recall_score(out_label_ids,preds, average=None).mean()) #
-        print('recall3', metrics.recall_score(out_label_ids,preds, average='macro')) #1.0
-        print('recall4', metrics.recall_score(out_label_ids,preds, average='micro')) #1.0
-        print('f1_score1', metrics.f1_score(out_label_ids,preds, average=None)) #
-        print('f1_score2', metrics.f1_score(out_label_ids,preds, average=None).mean()) #
-        print('f1_score3', metrics.f1_score(out_label_ids,preds, average='macro')) #1.0
-        print('f1_score4', metrics.f1_score(out_label_ids,preds, average='micro')) #1.0
+        logger.info('accuracy : %s', str(metrics.accuracy_score(out_label_ids,preds)))
+        logger.info('precision1 : %s', str(metrics.precision_score(out_label_ids,preds, average=None))) #
+        logger.info('precision2 : %s', str(metrics.precision_score(out_label_ids,preds, average=None).mean())) #
+        logger.info('precision3 : %s', str(metrics.precision_score(out_label_ids,preds, average='macro'))) #1.0
+        logger.info('precision4 : %s', str(metrics.precision_score(out_label_ids,preds, average='micro'))) #1.0
+        logger.info('recall1 : %s', str(metrics.recall_score(out_label_ids,preds, average=None))) #
+        logger.info('recall2 : %s', str(metrics.recall_score(out_label_ids,preds, average=None).mean())) #
+        logger.info('recall3 : %s', str(metrics.recall_score(out_label_ids,preds, average='macro'))) #1.0
+        logger.info('recall4 : %s', str(metrics.recall_score(out_label_ids,preds, average='micro'))) #1.0
+        logger.info('f1_score1 : %s', str(metrics.f1_score(out_label_ids,preds, average=None))) #
+        logger.info('f1_score2 : %s', str(metrics.f1_score(out_label_ids,preds, average=None).mean())) #
+        logger.info('f1_score3 : %s', str(metrics.f1_score(out_label_ids,preds, average='macro'))) #1.0
+        logger.info('f1_score4 : %s', str(metrics.f1_score(out_label_ids,preds, average='micro'))) #1.0
 
         print(metrics.classification_report(out_label_ids,preds))
         print(metrics.confusion_matrix(out_label_ids,preds))
