@@ -7,6 +7,10 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import AdamW, get_linear_schedule_with_warmup
 
+from torch.utils.tensorboard import SummaryWriter
+
+import sklearn.metrics as metrics
+
 from utils import compute_metrics, get_label, MODEL_CLASSES
 
 logger = logging.getLogger(__name__)
@@ -37,6 +41,10 @@ class Trainer(object):
         # GPU or CPU
         self.device = "cuda" if torch.cuda.is_available() and not args['no_cuda'] else "cpu"
         self.model.to(self.device)
+        
+        # Add Summary Writer
+        self.train_writer = SummaryWriter(os.path.join(args['model_dir'], 'train'))
+        self.test_writer = SummaryWriter(os.path.join(args['model_dir'], 'test'))
 
     def train(self):
         train_sampler = RandomSampler(self.train_dataset)
@@ -101,7 +109,7 @@ class Trainer(object):
                     global_step += 1
 
                     if self.args['logging_steps'] > 0 and global_step % self.args['logging_steps'] == 0:
-                        self.evaluate("test")  # Only test set available for NSMC
+                        self.evaluate("dev")  # Only test set available for NSMC
 
                     if self.args['save_steps'] > 0 and global_step % self.args['save_steps'] == 0:
                         self.save_model()
@@ -109,6 +117,11 @@ class Trainer(object):
                 if 0 < self.args['max_steps'] < global_step:
                     epoch_iterator.close()
                     break
+                
+                # Add current loss values to tensorboard
+                self.train_writer.add_scalar('loss', loss.item(), global_step)
+                self.train_writer.add_scalar('lr', scheduler.get_lr()[0], global_step)
+                self.train_writer.add_scalar('grad_norm', torch.norm(self.model.parameters()).item(), global_step)
 
             if 0 < self.args['max_steps'] < global_step:
                 train_iterator.close()
@@ -171,6 +184,22 @@ class Trainer(object):
         logger.info("***** Eval results *****")
         for key in sorted(results.keys()):
             logger.info("  %s = %s", key, str(results[key]))
+        print('accuracy', metrics.accuracy_score(out_label_ids,preds) )
+        print('precision1', metrics.precision_score(out_label_ids,preds, average=None)) #
+        print('precision2', metrics.precision_score(out_label_ids,preds, average=None).mean()) #
+        print('precision3', metrics.precision_score(out_label_ids,preds, average='macro')) #1.0
+        print('precision4', metrics.precision_score(out_label_ids,preds, average='micro')) #1.0
+        print('recall1', metrics.recall_score(out_label_ids,preds, average=None)) #
+        print('recall2', metrics.recall_score(out_label_ids,preds, average=None).mean()) #
+        print('recall3', metrics.recall_score(out_label_ids,preds, average='macro')) #1.0
+        print('recall4', metrics.recall_score(out_label_ids,preds, average='micro')) #1.0
+        print('f1_score1', metrics.f1_score(out_label_ids,preds, average=None)) #
+        print('f1_score2', metrics.f1_score(out_label_ids,preds, average=None).mean()) #
+        print('f1_score3', metrics.f1_score(out_label_ids,preds, average='macro')) #1.0
+        print('f1_score4', metrics.f1_score(out_label_ids,preds, average='micro')) #1.0
+
+        print(metrics.classification_report(out_label_ids,preds))
+        print(metrics.confusion_matrix(out_label_ids,preds))
 
         return results
 
