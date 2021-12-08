@@ -112,6 +112,10 @@ class Trainer(object):
                     scheduler.step()  # Update learning rate schedule
                     self.model.zero_grad()
                     global_step += 1
+                    
+                    # Add current loss values to tensorboard
+                    self.train_writer.add_scalar('train/loss', loss.item(), global_step)
+                    self.train_writer.add_scalar('train/trloss', tr_loss / global_step, global_step)
 
                     if self.args['logging_steps'] > 0 and global_step % self.args['logging_steps'] == 0:
                         self.evaluate("dev")  # Only test set available for NSMC
@@ -122,11 +126,6 @@ class Trainer(object):
                 if 0 < self.args['max_steps'] < global_step:
                     epoch_iterator.close()
                     break
-                
-                # Add current loss values to tensorboard
-                self.train_writer.add_scalar('train/loss', loss.item(), global_step)
-                self.train_writer.add_scalar('train/lr', scheduler.get_lr()[0], global_step)
-                self.train_writer.add_scalar('train/grad_norm', torch.norm(self.model.parameters()), global_step)
 
             if 0 < self.args['max_steps'] < global_step:
                 train_iterator.close()
