@@ -123,7 +123,7 @@ class Trainer(object):
                     break
                 
                 # Add current loss values to tensorboard
-                self.train_writer.add_scalar('loss', loss.item(), global_step)
+                self.train_writer.add_scalar('train/loss', tr_loss / global_step, global_step)
 
             if 0 < self.args['max_steps'] < global_step:
                 train_iterator.close()
