@@ -119,7 +119,9 @@ class Trainer(object):
                     break
                 
                 # Add current loss values to tensorboard
-                self.train_writer.add_scalar('train/loss', loss, step)
+                self.train_writer.add_scalar('train/loss', loss, global_step)
+                self.train_writer.add_scalar('train/lr', scheduler.get_lr()[0], global_step)
+                self.train_writer.add_scalar('train/grad_norm', torch.norm(self.model.parameters()), global_step)
 
             if 0 < self.args['max_steps'] < global_step:
                 train_iterator.close()
