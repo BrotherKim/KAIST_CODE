@@ -83,14 +83,19 @@ class Trainer(object):
         train_iterator = trange(int(self.args['num_train_epochs']), desc="Epoch")
 
         for _ in train_iterator:
+            # 데이터로더에서 배치를 가져온다.
             epoch_iterator = tqdm(train_dataloader, ncols=120, desc="Iteration")
             for step, batch in enumerate(epoch_iterator):
+                # 훈련 모드로 변경
                 self.model.train()
+                # 배치를 GPU에 복사
                 batch = tuple(t.to(self.device) for t in batch)  # GPU or CPU
+                # 배치로부터 입력값과 라벨을 가져온다.
                 inputs = {'input_ids': batch[0],
                           'attention_mask': batch[1],
                           'labels': batch[3]}
 
+                # forward 수행
                 outputs = self.model(**inputs)
                 loss = outputs[0]
 
@@ -119,7 +124,7 @@ class Trainer(object):
                     break
                 
                 # Add current loss values to tensorboard
-                self.train_writer.add_scalar('train/loss', loss, global_step)
+                self.train_writer.add_scalar('train/loss', loss.item(), global_step)
                 self.train_writer.add_scalar('train/lr', scheduler.get_lr()[0], global_step)
                 self.train_writer.add_scalar('train/grad_norm', torch.norm(self.model.parameters()), global_step)
 
