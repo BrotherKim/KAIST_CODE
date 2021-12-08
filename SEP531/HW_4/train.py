@@ -47,18 +47,15 @@ class Trainer(object):
         self.test_writer = SummaryWriter(os.path.join(args['model_dir'], 'test'))
 
     def train(self):
-        logger.info("***** 1 *****")
         train_sampler = RandomSampler(self.train_dataset)
         train_dataloader = DataLoader(self.train_dataset, sampler=train_sampler, batch_size=self.args['train_batch_size'])
 
-        logger.info("***** 2 *****")
         if self.args['max_steps'] > 0:
             t_total = self.args['max_steps']
             self.args['num_train_epochs'] = self.args['max_steps'] // (len(train_dataloader) // self.args['gradient_accumulation_steps']) + 1
         else:
             t_total = len(train_dataloader) // self.args['gradient_accumulation_steps'] * self.args['num_train_epochs']
 
-        logger.info("***** 3 *****")
         # Prepare optimizer and schedule (linear warmup and decay)
         no_decay = ['bias', 'LayerNorm.weight']
         optimizer_grouped_parameters = [
@@ -69,7 +66,6 @@ class Trainer(object):
         optimizer = AdamW(optimizer_grouped_parameters, lr=self.args['learning_rate'], eps=self.args['adam_epsilon'])
         scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=self.args['warmup_steps'], num_training_steps=t_total)
 
-        logger.info("***** 4 *****")
         # Train!
         logger.info("***** Running training *****")
         logger.info("  Num examples = %d", len(self.train_dataset))
@@ -123,7 +119,7 @@ class Trainer(object):
                     break
                 
                 # Add current loss values to tensorboard
-                self.train_writer.add_scalar('train/loss', tr_loss / global_step, global_step)
+                self.train_writer.add_scalar('train/loss', loss, step)
 
             if 0 < self.args['max_steps'] < global_step:
                 train_iterator.close()
